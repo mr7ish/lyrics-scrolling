@@ -1,0 +1,65 @@
+{
+  "name": "lyrics-scrolling",
+  "version": "0.1.0",
+  "description": "A Vue 3 + TypeScript lyrics scrolling library with LRC parsing utilities.",
+  "type": "module",
+  "packageManager": "npm@10.9.0",
+  "main": "./dist/lyrics-scrolling.cjs",
+  "module": "./dist/lyrics-scrolling.js",
+  "style": "./dist/lyrics-scrolling.css",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/lyrics-scrolling.js",
+      "require": "./dist/lyrics-scrolling.cjs"
+    },
+    "./style.css": "./dist/lyrics-scrolling.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview",
+    "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\"",
+    "build": "npm run clean && vite build && npm run build:types",
+    "build:types": "vue-tsc -p tsconfig.build.json",
+    "typecheck": "npm run typecheck:lib && npm run typecheck:playground",
+    "typecheck:lib": "vue-tsc -p tsconfig.lib.json --noEmit",
+    "typecheck:playground": "vue-tsc -p tsconfig.playground.json --noEmit",
+    "test": "vitest run",
+    "pack:check": "npm pack --dry-run",
+    "release:check": "npm run typecheck && npm run test && npm run build && npm run pack:check",
+    "prepublishOnly": "npm run release:check"
+  },
+  "keywords": [
+    "karaoke",
+    "lyrics",
+    "lrc",
+    "music",
+    "player",
+    "vue3",
+    "vue",
+    "typescript",
+    "scroller"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "vue": "^3.5.34"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.3",
+    "@vitejs/plugin-vue": "^6.0.6",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.3",
+    "vitest": "^3.2.4",
+    "vue": "^3.5.34",
+    "vue-tsc": "^3.2.8"
+  }
+}
