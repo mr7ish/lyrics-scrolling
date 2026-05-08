@@ -104,14 +104,9 @@ onBeforeUnmount(() => {
 
 <template>
   <main class="demo-shell">
-    <section class="demo-hero">
+    <section class="demo-layout">
       <div class="demo-copy">
-        <p class="demo-kicker">Vue 3 + TypeScript Library</p>
         <h1>Lyrics that stay readable while the music moves.</h1>
-        <p class="demo-summary">
-          This playground uses the public library entry, not private internals. It is a local
-          consumer of the same package structure that will be published to npm.
-        </p>
 
         <div class="demo-metadata">
           <span>{{ parsedLyrics.metadata.title ?? 'Untitled Track' }}</span>
@@ -250,45 +245,26 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <div class="demo-panel">
-        <LyricsScroller
-          :lines="parsedLyrics.lines"
-          :current-time-ms="playbackTimeMs"
-          :align="alignMode"
-          :highlight-mode="highlightMode"
-          :karaoke-mode="karaokeMode"
-          :karaoke-fallback-duration-ms="karaokeFallbackDurationMs"
-          :highlight-color="highlightColor"
-          :highlight-glow-color="highlightGlowColor"
-          :scroll-mode="scrollMode"
-        />
+      <div class="demo-preview">
+        <article class="demo-card demo-card--current">
+          <p class="demo-card__label">Current line</p>
+          <h2>{{ activeLine?.text || 'Waiting for the first timestamp...' }}</h2>
+        </article>
+
+        <div class="demo-panel">
+          <LyricsScroller
+            :lines="parsedLyrics.lines"
+            :current-time-ms="playbackTimeMs"
+            :align="alignMode"
+            :highlight-mode="highlightMode"
+            :karaoke-mode="karaokeMode"
+            :karaoke-fallback-duration-ms="karaokeFallbackDurationMs"
+            :highlight-color="highlightColor"
+            :highlight-glow-color="highlightGlowColor"
+            :scroll-mode="scrollMode"
+          />
+        </div>
       </div>
-    </section>
-
-    <section class="demo-insights">
-      <article class="demo-card">
-        <p class="demo-card__label">Current line</p>
-        <h2>{{ activeLine?.text || 'Waiting for the first timestamp...' }}</h2>
-      </article>
-
-      <article class="demo-card">
-        <p class="demo-card__label">Package shape</p>
-        <ul>
-          <li>The playground imports from `../src`, which mirrors consumer usage of the public entry.</li>
-          <li>The library build only ships `dist`, not the playground files.</li>
-          <li>`prepublishOnly` runs typecheck, tests, build, and `npm pack --dry-run`.</li>
-        </ul>
-      </article>
-
-      <article class="demo-card">
-        <p class="demo-card__label">Display mode</p>
-        <ul>
-          <li>`align="{{ alignMode }}"` controls whether the active line is centered or top-aligned.</li>
-          <li>`highlightMode="{{ highlightMode }}"` switches between full-line highlight and karaoke fill.</li>
-          <li>`karaokeMode="{{ karaokeMode }}"` switches between continuous width fill and discrete char steps.</li>
-          <li>`karaokeFallbackDurationMs={{ karaokeFallbackDurationMs }}` controls last-line fill duration.</li>
-        </ul>
-      </article>
     </section>
   </main>
 </template>
