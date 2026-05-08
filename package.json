@@ -1,6 +1,6 @@
 {
   "name": "lyrics-scrolling",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "description": "A Vue 3 + TypeScript lyrics scrolling library with LRC parsing utilities.",
   "type": "module",
   "packageManager": "npm@10.9.0",
