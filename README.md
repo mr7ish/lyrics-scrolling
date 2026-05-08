@@ -1,22 +1,32 @@
 # lyrics-scrolling
 
+[简体中文](./README.zh-CN.md)
+
 A Vue 3 + TypeScript lyrics scrolling component library for LRC-style lyrics.
-
-## Package layout
-
-- `src/`: publishable library source only
-- `playground/`: local Vite consumer app for manual testing
-- `dist/`: generated package output
-
-The published npm package is the repository root. Only `dist/` is shipped as runtime code, while `README.md`, `LICENSE`, and `package.json` are included automatically by npm.
 
 ## Install
 
+`vue` is a peer dependency and should be installed in the consuming project.
+
+### npm
+
 ```bash
-npm install lyrics-scrolling vue
+npm install lyrics-scrolling
 ```
 
-## Consumer usage
+### pnpm
+
+```bash
+pnpm add lyrics-scrolling
+```
+
+### bun
+
+```bash
+bun add lyrics-scrolling
+```
+
+## Usage
 
 Import both the component API and the published stylesheet:
 
@@ -54,15 +64,7 @@ const lines = computed(() => parsedLyrics.lines);
 </template>
 ```
 
-## Exports
-
-- `LyricsScroller`
-- `parseLrc`
-- `findActiveLyricIndex`
-- `stringifyLrcTime`
-- all public library types from `src/lib/types.ts`
-
-## Display modes
+## Display Modes
 
 - `align="center"` keeps the active lyric vertically centered.
 - `align="start"` pins the active lyric near the top of the viewport.
@@ -73,7 +75,7 @@ const lines = computed(() => parsedLyrics.lines);
 - `scroll-mode="smooth"` animates track movement with `scrollDurationMs`.
 - `scroll-mode="step"` jumps directly to the next active line with no transition.
 
-## Component props
+## Component Props
 
 - `lines`: parsed lyric line array.
 - `currentTimeMs`: current playback time in milliseconds.
@@ -91,43 +93,9 @@ const lines = computed(() => parsedLyrics.lines);
 - `hideEmptyLines`: whether timed blank lines should be hidden.
 - `placeholder`: empty-state copy.
 
-## LRC parsing behavior
+## LRC Parsing Behavior
 
 - Supports metadata tags like `[ti:]`, `[ar:]`, `[al:]`, `[by:]`, and `[offset:]`.
 - Supports repeated timestamps on a single lyric line.
 - Preserves empty timed lines so pauses can still participate in timing.
 - Applies the LRC `offset` value to parsed timestamps.
-
-## Development
-
-```bash
-npm install
-npm run dev
-npm run typecheck
-npm run test
-npm run build
-```
-
-`npm run dev` starts the local playground from `playground/`, while `npm run build` only builds the publishable library.
-
-## Publishing
-
-The package now includes a release gate:
-
-```bash
-npm run release:check
-```
-
-This runs:
-
-- library + playground typecheck
-- tests
-- clean library build
-- declaration generation
-- `npm pack --dry-run`
-
-If that passes, publish from the repository root:
-
-```bash
-npm publish
-```

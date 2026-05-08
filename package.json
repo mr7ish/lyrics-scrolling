@@ -49,6 +49,14 @@
     "typescript",
     "scroller"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mr7ish/lyrics-scrolling.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mr7ish/lyrics-scrolling/issues"
+  },
+  "homepage": "https://github.com/mr7ish/lyrics-scrolling#readme",
   "license": "MIT",
   "peerDependencies": {
     "vue": "^3.5.34"
