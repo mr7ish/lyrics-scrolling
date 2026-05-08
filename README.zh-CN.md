@@ -1,10 +1,10 @@
-# lyrics-scrolling
+# lyrics-scrolling 🎵
 
-[English](./README.md)
+🌐 [English](./README.md)
 
 一个基于 Vue 3 + TypeScript 的 LRC 歌词滚动组件库。
 
-## 安装
+## 📦 安装
 
 `vue` 是 `peer dependency`，需要在使用方项目中一并安装。
 
@@ -26,7 +26,7 @@ pnpm add lyrics-scrolling
 bun add lyrics-scrolling
 ```
 
-## 使用方式
+## 🚀 使用方式
 
 同时引入组件 API 和样式文件：
 
@@ -64,7 +64,7 @@ const lines = computed(() => parsedLyrics.lines);
 </template>
 ```
 
-## 显示模式
+## 🎛 显示模式
 
 - `align="center"`：当前歌词垂直居中显示。
 - `align="start"`：当前歌词靠近容器顶部显示。
@@ -75,7 +75,7 @@ const lines = computed(() => parsedLyrics.lines);
 - `scroll-mode="smooth"`：按 `scrollDurationMs` 做平滑滚动。
 - `scroll-mode="step"`：逐行直接跳转，不做过渡动画。
 
-## 组件属性
+## 🧩 组件属性
 
 - `lines`：解析后的歌词行数组。
 - `currentTimeMs`：当前播放时间，单位毫秒。
@@ -93,7 +93,7 @@ const lines = computed(() => parsedLyrics.lines);
 - `hideEmptyLines`：是否隐藏带时间戳的空白歌词行。
 - `placeholder`：无歌词时的占位文案。
 
-## LRC 解析行为
+## 📝 LRC 解析行为
 
 - 支持 `[ti:]`、`[ar:]`、`[al:]`、`[by:]`、`[offset:]` 等元信息标签。
 - 支持同一行多个时间标签。

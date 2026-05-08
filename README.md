@@ -1,10 +1,10 @@
-# lyrics-scrolling
+# lyrics-scrolling 🎵
 
-[简体中文](./README.zh-CN.md)
+🌐 [简体中文](./README.zh-CN.md)
 
 A Vue 3 + TypeScript lyrics scrolling component library for LRC-style lyrics.
 
-## Install
+## 📦 Install
 
 `vue` is a peer dependency and should be installed in the consuming project.
 
@@ -26,7 +26,7 @@ pnpm add lyrics-scrolling
 bun add lyrics-scrolling
 ```
 
-## Usage
+## 🚀 Usage
 
 Import both the component API and the published stylesheet:
 
@@ -64,7 +64,7 @@ const lines = computed(() => parsedLyrics.lines);
 </template>
 ```
 
-## Display Modes
+## 🎛 Display Modes
 
 - `align="center"` keeps the active lyric vertically centered.
 - `align="start"` pins the active lyric near the top of the viewport.
@@ -75,7 +75,7 @@ const lines = computed(() => parsedLyrics.lines);
 - `scroll-mode="smooth"` animates track movement with `scrollDurationMs`.
 - `scroll-mode="step"` jumps directly to the next active line with no transition.
 
-## Component Props
+## 🧩 Component Props
 
 - `lines`: parsed lyric line array.
 - `currentTimeMs`: current playback time in milliseconds.
@@ -93,7 +93,7 @@ const lines = computed(() => parsedLyrics.lines);
 - `hideEmptyLines`: whether timed blank lines should be hidden.
 - `placeholder`: empty-state copy.
 
-## LRC Parsing Behavior
+## 📝 LRC Parsing Behavior
 
 - Supports metadata tags like `[ti:]`, `[ar:]`, `[al:]`, `[by:]`, and `[offset:]`.
 - Supports repeated timestamps on a single lyric line.
