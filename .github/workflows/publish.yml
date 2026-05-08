@@ -40,4 +40,4 @@ jobs:
       - name: Publish to npm
         run: npm publish --access public --provenance --ignore-scripts
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.LYRICSSCROLLING }}
+          NODE_AUTH_TOKEN: ${{ secrets.LYRICS_SCROLLING_TOKEN }}
