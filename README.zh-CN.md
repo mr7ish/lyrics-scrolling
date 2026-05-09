@@ -4,6 +4,8 @@
 
 一个基于 Vue 3 + TypeScript 的 LRC 歌词滚动组件库。
 
+如果要让 AI 工具基于本库生成或集成代码，请参考 [AI 使用指引](./AI_USAGE.md)。
+
 ## 📦 安装
 
 `vue` 是 `peer dependency`，需要在使用方项目中一并安装。

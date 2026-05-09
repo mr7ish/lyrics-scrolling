@@ -4,6 +4,8 @@
 
 A Vue 3 + TypeScript lyrics scrolling component library for LRC-style lyrics.
 
+For AI-assisted code generation and integration guidance, see [AI Usage Guide](./AI_USAGE.md).
+
 ## 📦 Install
 
 `vue` is a peer dependency and should be installed in the consuming project.
