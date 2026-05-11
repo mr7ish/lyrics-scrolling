@@ -67,6 +67,14 @@ const translateY = computed(() => {
   return -resolvedIndex * props.lineHeight;
 });
 
+const activeLine = computed(() => {
+  if (activeIndex.value < 0) {
+    return null;
+  }
+
+  return displayLines.value[activeIndex.value] ?? null;
+});
+
 const graphemeSegmenter =
   typeof Intl !== 'undefined' && 'Segmenter' in Intl
     ? new Intl.Segmenter('zh-CN', { granularity: 'grapheme' })
@@ -80,83 +88,63 @@ function splitGraphemes(text: string): string[] {
   return Array.from(text);
 }
 
-const segmentedLineTexts = computed(() =>
-  displayLines.value.map((line) => splitGraphemes(line.text || '\u00A0')),
+const lineDurationsMs = computed(() =>
+  displayLines.value.map((line, index) => {
+    const nextLine = displayLines.value[index + 1];
+
+    if (nextLine && nextLine.timeMs > line.timeMs) {
+      return nextLine.timeMs - line.timeMs;
+    }
+
+    return Math.max(1, props.karaokeFallbackDurationMs);
+  }),
 );
 
-function getLineDurationMs(index: number): number {
-  const currentLine = displayLines.value[index];
-
-  if (!currentLine) {
-    return Math.max(1, props.karaokeFallbackDurationMs);
-  }
-
-  const nextLine = displayLines.value[index + 1];
-
-  if (nextLine && nextLine.timeMs > currentLine.timeMs) {
-    return nextLine.timeMs - currentLine.timeMs;
-  }
-
-  return Math.max(1, props.karaokeFallbackDurationMs);
-}
-
 const activeFillProgress = computed(() => {
-  const resolvedIndex = activeIndex.value;
-
-  if (resolvedIndex < 0) {
+  if (props.highlightMode !== 'karaoke' || !activeLine.value) {
     return 0;
   }
 
-  const currentLine = displayLines.value[resolvedIndex];
-
-  if (!currentLine) {
-    return 0;
-  }
-
-  const progress =
-    (props.currentTimeMs - currentLine.timeMs) / getLineDurationMs(resolvedIndex);
+  const durationMs =
+    lineDurationsMs.value[activeIndex.value] ?? Math.max(1, props.karaokeFallbackDurationMs);
+  const progress = (props.currentTimeMs - activeLine.value.timeMs) / durationMs;
 
   return Math.min(1, Math.max(0, progress));
 });
 
-function getLineFillProgress(index: number): number {
-  if (props.highlightMode !== 'karaoke') {
-    return 0;
+const activeLineText = computed(() => activeLine.value?.text || '\u00A0');
+
+const activeLineSegments = computed(() => {
+  if (props.karaokeMode !== 'char-step' || !activeLine.value) {
+    return [];
   }
 
-  if (index === activeIndex.value) {
-    return activeFillProgress.value;
-  }
+  return splitGraphemes(activeLineText.value);
+});
 
-  return 0;
-}
-
-function getLineFillText(index: number): string {
-  const progress = getLineFillProgress(index);
-
-  if (progress <= 0) {
+const activeFillText = computed(() => {
+  if (activeFillProgress.value <= 0) {
     return '';
   }
 
-  const text = displayLines.value[index]?.text || '\u00A0';
-
   if (props.karaokeMode === 'width-fill') {
-    return text;
+    return activeLineText.value;
   }
 
-  const segments = segmentedLineTexts.value[index] ?? splitGraphemes(text);
-  const filledCount = progress >= 1 ? segments.length : Math.floor(progress * segments.length);
+  const segments = activeLineSegments.value;
+  const filledCount =
+    activeFillProgress.value >= 1
+      ? segments.length
+      : Math.floor(activeFillProgress.value * segments.length);
 
   if (filledCount <= 0) {
     return '';
   }
 
   return segments.slice(0, filledCount).join('');
-}
+});
 
-function getLineFillStyle(index: number): Record<string, string> {
-  const progress = getLineFillProgress(index);
-
+const activeFillStyle = computed<Record<string, string>>(() => {
   if (props.karaokeMode === 'char-step') {
     return {
       width: 'auto',
@@ -164,9 +152,11 @@ function getLineFillStyle(index: number): Record<string, string> {
   }
 
   return {
-    width: `${progress * 100}%`,
+    width: `${activeFillProgress.value * 100}%`,
   };
-}
+});
+
+const hasActiveFill = computed(() => activeFillText.value.length > 0);
 
 const viewportStyle = computed(() => ({
   '--lyrics-inactive-opacity': String(props.inactiveOpacity),
@@ -207,8 +197,8 @@ const trackStyle = computed(() => ({
       >
         <slot
           :line="line"
-          :fill-progress="getLineFillProgress(index)"
-          :fill-text="getLineFillText(index)"
+          :fill-progress="index === activeIndex ? activeFillProgress : 0"
+          :fill-text="index === activeIndex ? activeFillText : ''"
           :index="index"
           :is-active="index === activeIndex"
           :is-past="index < activeIndex"
@@ -217,12 +207,12 @@ const trackStyle = computed(() => ({
           <span class="lyrics-scroller__text">
             <span class="lyrics-scroller__text-base">{{ line.text || '\u00A0' }}</span>
             <span
-              v-if="props.highlightMode === 'karaoke' && getLineFillProgress(index) > 0"
+              v-if="props.highlightMode === 'karaoke' && index === activeIndex && hasActiveFill"
               class="lyrics-scroller__text-fill"
-              :style="getLineFillStyle(index)"
+              :style="activeFillStyle"
               aria-hidden="true"
             >
-              {{ getLineFillText(index) }}
+              {{ activeFillText }}
             </span>
           </span>
         </slot>
