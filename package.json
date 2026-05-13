@@ -14,7 +14,11 @@
       "import": "./dist/lyrics-scrolling.js",
       "require": "./dist/lyrics-scrolling.cjs"
     },
-    "./style.css": "./dist/lyrics-scrolling.css",
+    "./style.css": {
+      "types": "./dist/style.css.d.ts",
+      "import": "./dist/lyrics-scrolling.css",
+      "default": "./dist/lyrics-scrolling.css"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -28,8 +32,9 @@
     "dev": "vite",
     "preview": "vite preview",
     "clean": "node --input-type=module -e \"import { rmSync } from 'node:fs'; rmSync('dist', { recursive: true, force: true });\"",
-    "build": "npm run clean && vite build && npm run build:types",
+    "build": "npm run clean && vite build && npm run build:types && npm run build:style-types",
     "build:types": "vue-tsc -p tsconfig.build.json",
+    "build:style-types": "node --input-type=module -e \"import { writeFileSync } from 'node:fs'; writeFileSync('dist/style.css.d.ts', 'export {};\\n');\"",
     "typecheck": "npm run typecheck:lib && npm run typecheck:playground",
     "typecheck:lib": "vue-tsc -p tsconfig.lib.json --noEmit",
     "typecheck:playground": "vue-tsc -p tsconfig.playground.json --noEmit",
