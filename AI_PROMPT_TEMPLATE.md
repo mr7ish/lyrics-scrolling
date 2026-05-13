@@ -1,6 +1,6 @@
 # lyrics-scrolling AI 提示词模板
 
-本文件提供一组可直接复制的提示词模板，用于指导 AI 在项目中正确接入 `lyrics-scrolling`。
+本文档提供一组可直接复制的提示词模板，用于指导 AI 在项目中正确接入 `lyrics-scrolling`。
 
 使用原则：
 
@@ -30,7 +30,7 @@
 
 ## 模板 2：和 audio 元素联动
 
-适合场景：页面中已有原生音频播放器，需要驱动歌词高亮和滚动。
+适合场景：页面中已经有原生音频播放器，需要驱动歌词高亮和滚动。
 
 ```text
 请先阅读项目根目录的 AI_USAGE.md，并严格按照其中的规则使用 lyrics-scrolling。
@@ -39,9 +39,9 @@
 
 要求：
 1. 使用 parseLrc 解析歌词
-2. 使用 audio.currentTime * 1000 得到 currentTimeMs
-3. 把 currentTimeMs 响应式传给 LyricsScroller
-4. 不要封装新的播放器 SDK，只使用原生 audio
+2. 优先使用 useAudioPlaybackTime({ audioElement, fallbackMaxTimeMs }) 来同步 playbackTimeMs
+3. 把 playbackTimeMs 响应式传给 LyricsScroller
+4. audioElement 由页面自己创建并传给 composable，不要封装新的播放器 SDK
 5. 不要编造不存在的 props，例如 lyrics、theme、onLineChange、audioSrc
 6. 代码风格使用 <script setup lang="ts">
 
@@ -82,14 +82,14 @@
 
 当前条件：
 - 技术栈：[在这里填写，例如 Vue 3 + TypeScript]
-- 当前播放时间来源：[在这里填写，例如 audio.currentTime]
+- 当前播放时间来源：[在这里填写，例如 audio.currentTime 或 useAudioPlaybackTime]
 - 歌词数据来源：[在这里填写，例如接口返回 LRC 字符串]
 - 目标文件：[在这里填写文件路径]
 
 要求：
 1. 只做完成需求所需的最小修改
 2. 保持现有状态管理和组件结构
-3. 如果当前时间是秒，请转换成毫秒后再传给 currentTimeMs
+3. 如果页面已经有原生 <audio>，优先使用 useAudioPlaybackTime
 4. 如果歌词还是原始字符串，请先 parseLrc
 5. 不要使用文档中不存在的 API
 
@@ -110,7 +110,7 @@
 2. 是否错误地把秒传给了 currentTimeMs
 3. 是否错误地把原始 LRC 字符串直接传给了 lines
 4. 是否使用了不存在的 props、事件或导出项
-5. 是否本该使用 LyricsScroller，却重复造了滚动逻辑
+5. 页面已有 <audio> 时，是否本该使用 useAudioPlaybackTime 却重复造了同步逻辑
 
 请输出修复后的代码。
 ```
@@ -125,6 +125,7 @@
 - 用 parseLrc 解析歌词
 - 传入 parsedLyrics.lines
 - currentTimeMs 使用毫秒
+- 页面已有原生 <audio> 时优先使用 useAudioPlaybackTime
 - 不要使用不存在的 props、事件或导出项
 ```
 
@@ -136,6 +137,7 @@
 - 当前页面代码
 - 使用的状态管理方式
 - 歌词来源是本地字符串、接口返回还是播放器回调
+- 当前播放时间是手动维护，还是来自原生 `<audio>`
 - 你想要的 UI 风格
 - 是否需要 `karaoke` 模式
 - 是否需要自定义插槽
@@ -147,16 +149,11 @@
 第一段先立规则：
 
 ```text
-先阅读 AI_USAGE.md，并把它当作使用 lyrics-scrolling 的唯一规范。
-如果我的需求和 AI_USAGE.md 冲突，以 AI_USAGE.md 为准。
-不要臆造任何未公开 API。
+先阅读 AI_USAGE.md，并把它当作使用 lyrics-scrolling 的唯一规范。如果我的需求和 AI_USAGE.md 冲突，以 AI_USAGE.md 为准。不要臆造任何未公开 API。
 ```
 
 第二段再写业务需求：
 
 ```text
-现在请在 [文件路径] 中实现 [你的需求]。
-当前歌词来源是 [你的来源]。
-当前播放时间来源是 [你的来源]。
-我需要的效果是 [你的效果]。
+现在请在 [文件路径] 中实现 [你的需求]。当前歌词来源是 [你的来源]。当前播放时间来源是 [你的来源]。如果页面已经有原生 <audio>，优先使用 useAudioPlaybackTime。我要的效果是 [你的效果]。
 ```

@@ -36,6 +36,8 @@ Import both the component API and the published stylesheet:
 import 'lyrics-scrolling/style.css';
 ```
 
+### Basic Component Usage
+
 ```vue
 <script setup lang="ts">
 import { computed, ref } from 'vue';
@@ -62,6 +64,75 @@ const lines = computed(() => parsedLyrics.lines);
     highlight-color="#fff8eb"
     highlight-glow-color="rgba(255, 201, 105, 0.16)"
     scroll-mode="smooth"
+  />
+</template>
+```
+
+### Sync With Native Audio
+
+`useAudioPlaybackTime` is a library-level composable that keeps `playbackTimeMs` in sync with an existing `HTMLAudioElement`. It listens to audio events, uses `requestAnimationFrame` while playback is active, and exposes helpers for play, pause, restart, and seeking.
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import {
+  LyricsScroller,
+  parseLrc,
+  useAudioPlaybackTime,
+} from 'lyrics-scrolling';
+import 'lyrics-scrolling/style.css';
+
+const audioElement = ref<HTMLAudioElement | null>(null);
+
+const parsedLyrics = parseLrc(`[ti:Demo Song]
+[ar:Codex]
+[00:00.00]First line
+[00:05.20]Second line`);
+
+const totalDurationMs = computed(() => {
+  const lastLine = parsedLyrics.lines.at(-1);
+  return lastLine ? lastLine.timeMs + 2200 : 60_000;
+});
+
+const {
+  isPlaying,
+  playbackTimeMs,
+  restartPlayback,
+  seekToTimeMs,
+  timelineMaxMs,
+  togglePlayback,
+} = useAudioPlaybackTime({
+  audioElement,
+  fallbackMaxTimeMs: totalDurationMs,
+});
+
+function handleTimelineInput(event: Event): void {
+  seekToTimeMs(Number((event.target as HTMLInputElement).value));
+}
+</script>
+
+<template>
+  <audio ref="audioElement" controls preload="metadata" />
+
+  <button type="button" @click="togglePlayback">
+    {{ isPlaying ? 'Pause' : 'Play' }}
+  </button>
+  <button type="button" @click="restartPlayback">Reset</button>
+
+  <input
+    :value="playbackTimeMs"
+    type="range"
+    min="0"
+    :max="timelineMaxMs"
+    step="10"
+    @input="handleTimelineInput"
+  />
+
+  <LyricsScroller
+    :lines="parsedLyrics.lines"
+    :current-time-ms="playbackTimeMs"
+    highlight-mode="karaoke"
+    karaoke-mode="width-fill"
   />
 </template>
 ```
@@ -94,6 +165,24 @@ const lines = computed(() => parsedLyrics.lines);
 - `scrollDurationMs`: transform transition duration in smooth mode.
 - `hideEmptyLines`: whether timed blank lines should be hidden.
 - `placeholder`: empty-state copy.
+
+## Composable API
+
+### `useAudioPlaybackTime(options)`
+
+Options:
+
+- `audioElement`: `Ref<HTMLAudioElement | null>`. A ref to an existing native audio element.
+- `fallbackMaxTimeMs`: `number | Ref<number> | (() => number)`. Used as the slider upper bound until audio metadata is available.
+
+Returns:
+
+- `isPlaying`: whether the audio element is currently playing.
+- `playbackTimeMs`: current synced playback time in milliseconds.
+- `timelineMaxMs`: resolved upper bound for seeking and sliders.
+- `togglePlayback()`: plays or pauses the bound audio element.
+- `restartPlayback()`: pauses and seeks back to `0`.
+- `seekToTimeMs(timeMs)`: seeks the bound audio element and syncs reactive time.
 
 ## 📝 LRC Parsing Behavior
 
