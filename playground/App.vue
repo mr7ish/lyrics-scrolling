@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import {
   LyricsScroller,
   findActiveLyricIndex,
   parseLrc,
+  useAudioPlaybackTime,
   type LyricsScrollerAlign,
   type LyricsScrollerHighlightMode,
   type LyricsScrollerKaraokeMode,
   type LyricsScrollerScrollMode,
 } from '../src';
+import demoAudioSource from '../Taylor Swift - Lover - Lover.flac';
 import { sampleLyrics } from './sampleLyrics';
 
 const parsedLyrics = parseLrc(sampleLyrics);
-const playbackTimeMs = ref(0);
-const isPlaying = ref(false);
 const alignMode = ref<LyricsScrollerAlign>('center');
 const highlightMode = ref<LyricsScrollerHighlightMode>('karaoke');
 const karaokeMode = ref<LyricsScrollerKaraokeMode>('width-fill');
@@ -21,12 +21,24 @@ const karaokeFallbackDurationMs = ref(2200);
 const highlightColor = ref('#fff8eb');
 const highlightGlowColor = ref('#ffc969');
 const scrollMode = ref<LyricsScrollerScrollMode>('smooth');
-const animationFrameId = ref<number>();
-const previousFrameTime = ref<number>();
+const audioFileName = 'Taylor Swift - Lover - Lover.flac';
+const audioElement = ref<HTMLAudioElement | null>(null);
 
 const totalDurationMs = computed(() => {
   const lastLine = parsedLyrics.lines.at(-1);
   return lastLine ? lastLine.timeMs + karaokeFallbackDurationMs.value + 2_000 : 60_000;
+});
+
+const {
+  isPlaying,
+  playbackTimeMs,
+  restartPlayback,
+  seekToTimeMs,
+  timelineMaxMs,
+  togglePlayback,
+} = useAudioPlaybackTime({
+  audioElement,
+  fallbackMaxTimeMs: totalDurationMs,
 });
 
 const activeLineIndex = computed(() =>
@@ -41,16 +53,6 @@ const formattedTime = computed(() => {
   const seconds = totalSeconds % 60;
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 });
-
-function togglePlayback(): void {
-  isPlaying.value = !isPlaying.value;
-}
-
-function restartPlayback(): void {
-  playbackTimeMs.value = 0;
-  previousFrameTime.value = undefined;
-  isPlaying.value = false;
-}
 
 function setAlignMode(mode: LyricsScrollerAlign): void {
   alignMode.value = mode;
@@ -68,38 +70,10 @@ function setScrollMode(mode: LyricsScrollerScrollMode): void {
   scrollMode.value = mode;
 }
 
-function tick(frameTime: number): void {
-  if (isPlaying.value) {
-    const delta = previousFrameTime.value ? frameTime - previousFrameTime.value : 0;
-    playbackTimeMs.value = Math.min(totalDurationMs.value, playbackTimeMs.value + delta);
-  }
-
-  previousFrameTime.value = frameTime;
-  animationFrameId.value = window.requestAnimationFrame(tick);
+function handleTimelineInput(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  seekToTimeMs(Number(input.value));
 }
-
-watch(playbackTimeMs, (value) => {
-  if (value >= totalDurationMs.value) {
-    isPlaying.value = false;
-    previousFrameTime.value = undefined;
-  }
-});
-
-watch(isPlaying, (value) => {
-  if (!value) {
-    previousFrameTime.value = undefined;
-  }
-});
-
-onMounted(() => {
-  animationFrameId.value = window.requestAnimationFrame(tick);
-});
-
-onBeforeUnmount(() => {
-  if (animationFrameId.value !== undefined) {
-    window.cancelAnimationFrame(animationFrameId.value);
-  }
-});
 </script>
 
 <template>
@@ -112,6 +86,17 @@ onBeforeUnmount(() => {
           <span>{{ parsedLyrics.metadata.title ?? 'Untitled Track' }}</span>
           <span>{{ parsedLyrics.metadata.artist ?? 'Unknown Artist' }}</span>
           <span>{{ parsedLyrics.lines.length }} timed lines</span>
+          <span>{{ audioFileName }}</span>
+        </div>
+
+        <div class="demo-audio">
+          <audio
+            ref="audioElement"
+            class="demo-audio__player"
+            :src="demoAudioSource"
+            preload="metadata"
+            controls
+          />
         </div>
 
         <div class="demo-controls">
@@ -125,11 +110,12 @@ onBeforeUnmount(() => {
         <label class="demo-slider">
           <span>Timeline</span>
           <input
-            v-model.number="playbackTimeMs"
+            :value="playbackTimeMs"
             type="range"
             min="0"
-            :max="totalDurationMs"
+            :max="timelineMaxMs"
             step="10"
+            @input="handleTimelineInput"
           />
         </label>
 

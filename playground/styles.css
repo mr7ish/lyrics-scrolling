@@ -120,6 +120,21 @@ input {
   font-size: 0.86rem;
 }
 
+.demo-audio {
+  display: grid;
+  margin-top: 1rem;
+}
+
+.demo-audio__player {
+  width: 100%;
+}
+
+.demo-audio__player {
+  min-height: 52px;
+  border-radius: 18px;
+  opacity: 0.92;
+}
+
 .demo-controls {
   display: flex;
   flex-wrap: wrap;
